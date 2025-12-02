@@ -13,12 +13,8 @@
 //                              GND -|＿＿＿＿|- PB0 AREF AIN0 PCINT0 MOSI DI SDA OC0A OC1An
 // clang-format on
 
-using namespace bs2rst;
-
 static constexpr uint8_t PICO_BOOTSEL_PIN = PB2;
 static constexpr uint8_t PICO_RESET_PIN = PB4;
-
-static uint16_t push_time_ms = 0;
 
 int main() {
   CLKPR = (1 << CLKPCE);  // Enable change of the clock prescaler
@@ -31,7 +27,6 @@ int main() {
   // Setup pin change interrupt for PICO_BOOTSEL_PIN
   MCUCR |= (1 << ISC01) | (1 << ISC00);
   GIMSK |= (1 << INT0);
-  sei();
 
   // Start Timer0 for 1ms tick
   TCCR0A = (1 << WGM01);         // CTC mode
@@ -39,6 +34,10 @@ int main() {
   OCR0A = F_CPU / 8 / 1000 - 1;  // Compare value for 1ms
   TCNT0 = 0;
   TIMSK |= (1 << OCIE0A);  // Enable timer compare interrupt
+
+  bs2rst::init();
+
+  sei();
 
   // Sleep
   while (true) {
@@ -51,38 +50,14 @@ int main() {
   return 0;
 }
 
-ISR(INT0_vect) {
-  if (push_time_ms < SHORT_PUSH_TIME_MS) {
-    push_time_ms = 0;
-  }
-}
+ISR(INT0_vect) { bs2rst::bootsel_rose(); }
 
-ISR(TIMER0_COMPA_vect) {
-  bool pressed = !(PINB & (1 << PICO_BOOTSEL_PIN));
-  bool reset_enable = false;
+ISR(TIMER0_COMPA_vect) { bs2rst::tick_ms(); }
 
-  if (push_time_ms < SHORT_PUSH_TIME_MS) {
-    if (pressed) {
-      push_time_ms++;
-    } else {
-      push_time_ms = 0;
-    }
-  } else if (push_time_ms < LONG_PUSH_TIME_MS) {
-    if (pressed) {
-      push_time_ms++;
-    } else {
-      push_time_ms = LONG_PUSH_TIME_MS;
-    }
-  } else if (push_time_ms < LONG_PUSH_TIME_MS + RESET_HOLD_TIME_MS) {
-    reset_enable = true;
-    push_time_ms++;
-  } else {
-    if (!pressed) {
-      push_time_ms = 0;
-    }
-  }
+bool bs2rst::bootsel_read() { return !(PINB & (1 << PICO_BOOTSEL_PIN)); }
 
-  if (reset_enable) {
+void bs2rst::reset_write(bool enable) {
+  if (enable) {
     PORTB &= ~(1 << PICO_RESET_PIN);
     DDRB |= (1 << PICO_RESET_PIN);
   } else {
