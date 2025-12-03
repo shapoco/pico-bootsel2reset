@@ -14,45 +14,63 @@
 // clang-format on
 
 static constexpr uint8_t PICO_BOOTSEL_PIN = PB2;
-static constexpr uint8_t PICO_RESET_PIN = PB4;
+static constexpr uint8_t PICO_RESET_PIN = PB3;
+static constexpr uint8_t TIMESEL_PIN = PB4;
+
+static void set_int0_mode(bool edge) {
+  if (edge) {
+    // edge-sensitive
+    MCUCR &= (1 << ISC01);
+    MCUCR |= (1 << ISC00);
+  } else {
+    // level-sensitive
+    MCUCR &= ~((1 << ISC01) | (1 << ISC00));
+  }
+}
 
 int main() {
   CLKPR = (1 << CLKPCE);  // Enable change of the clock prescaler
   CLKPR = 3;              // Set clock prescaler to divide by 8 (1MHz)
 
   // Set pin directions
-  DDRB &= ~((1 << PICO_BOOTSEL_PIN) | (1 << PICO_RESET_PIN));
-  PORTB |= (1 << PICO_BOOTSEL_PIN);
+  DDRB &=
+      ~((1 << PICO_BOOTSEL_PIN) | (1 << PICO_RESET_PIN) | (1 << TIMESEL_PIN));
+  PORTB |= (1 << PICO_BOOTSEL_PIN) | (1 << TIMESEL_PIN);  // Enable pull-ups
 
   // Setup pin change interrupt for PICO_BOOTSEL_PIN
-  MCUCR |= (1 << ISC01) | (1 << ISC00);
+  set_int0_mode(true);
   GIMSK |= (1 << INT0);
-
-  // Start Timer0 for 1ms tick
-  TCCR0A = (1 << WGM01);         // CTC mode
-  TCCR0B = (1 << CS01);          // Prescaler: clk/64
-  OCR0A = F_CPU / 8 / 1000 - 1;  // Compare value for 1ms
-  TCNT0 = 0;
-  TIMSK |= (1 << OCIE0A);  // Enable timer compare interrupt
-
-  bs2rst::init();
 
   sei();
 
+  bs2rst::init();
+
   // Sleep
   while (true) {
-    set_sleep_mode(SLEEP_MODE_IDLE);
-    sleep_enable();
-    sleep_cpu();
-    sleep_disable();
+    bs2rst::service();
   }
 
   return 0;
 }
 
-ISR(INT0_vect) { bs2rst::bootsel_rose(); }
+ISR(INT0_vect) { bs2rst::bootsel_change(); }
 
-ISR(TIMER0_COMPA_vect) { bs2rst::tick_ms(); }
+ISR(TIMER0_COMPA_vect) { bs2rst::timer_tick(); }
+
+void bs2rst::timer_start() {
+  TCCR0A = (1 << WGM01);  // CTC mode
+  TCCR0B = (1 << CS01);   // Prescaler: clk/8
+  OCR0A = F_CPU / 8 / 1000 - 1;
+  TCNT0 = 0;
+  TIMSK |= (1 << OCIE0A);
+}
+
+void bs2rst::timer_stop() {
+  TIMSK &= ~(1 << OCIE0A);
+  TCCR0A = 0;
+}
+
+bool bs2rst::timesel_read() { return !(PINB & (1 << TIMESEL_PIN)); }
 
 bool bs2rst::bootsel_read() { return !(PINB & (1 << PICO_BOOTSEL_PIN)); }
 
@@ -63,4 +81,14 @@ void bs2rst::reset_write(bool enable) {
   } else {
     DDRB &= ~(1 << PICO_RESET_PIN);
   }
+}
+
+void bs2rst::cpu_sleep(bool deep) {
+  // Recovery from power down state is only possible in level sensitivity
+  set_int0_mode(!deep);
+  set_sleep_mode(deep ? SLEEP_MODE_PWR_DOWN : SLEEP_MODE_IDLE);
+  sleep_enable();
+  sleep_cpu();
+  sleep_disable();
+  set_int0_mode(true);
 }
