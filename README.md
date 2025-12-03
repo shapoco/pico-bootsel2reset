@@ -21,7 +21,9 @@ https://github.com/user-attachments/assets/045de19f-95cd-49d6-bd9e-31ea8d296164
 |Open|4 sec|
 |Connect to GND|500 ms|
 
-## for ATtiny85
+## For ATtiny85
+
+### Pin Assign
 
 |Pin|Signal|
 |:--:|:--|
@@ -34,3 +36,11 @@ https://github.com/user-attachments/assets/045de19f-95cd-49d6-bd9e-31ea8d296164
 |7|BOOTSEL|
 |8|3V3|
 
+### Fuse
+
+Use the default values ​​for the fuse bytes.
+
+|Byte|Value|
+|:--|:--|
+|High Byte|0xDF|
+|Low Byte|0x62|
