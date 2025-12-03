@@ -15,7 +15,17 @@ static bool timer_running = false;
 static void activate();
 static void deactivate(bool force = false);
 
-void init() { deactivate(true); }
+void init() {
+  if (bootsel_read()) {
+    release_detected = false;
+    pressed = true;
+    debounce_counter = 10;
+    state_counter = HOLD_TIME_LONG_MS + RESET_HOLD_TIME_MS;
+    timer_start();
+  } else {
+    deactivate(true);
+  }
+}
 
 void service() { cpu_sleep(!timer_running); }
 
@@ -97,13 +107,12 @@ static void activate() {
 }
 
 static void deactivate(bool force) {
-  if (timer_running) {
+  if (timer_running || force) {
     timer_stop();
     timer_running = false;
   }
   release_detected = false;
   pressed = false;
-  release_detected = false;
   debounce_counter = 0;
   state_counter = STATE_STOP;
 }
