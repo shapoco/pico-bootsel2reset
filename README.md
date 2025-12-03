@@ -25,7 +25,7 @@ https://github.com/user-attachments/assets/045de19f-95cd-49d6-bd9e-31ea8d296164
 
 ### Pin Assign
 
-|Pin|ATtiny85|Pico|
+|Pin|ATtiny85|Signal|
 |:--:|:--|:--|
 |1|PB5 (RESET)||
 |2|PB3|RUN|
