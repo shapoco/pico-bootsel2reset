@@ -70,3 +70,10 @@ Use the default values ​​for the fuse bytes.
 |OSCCFG|0x02|
 |SYSCFG0|0xF7|
 |SYSCFG1|0x07|
+
+## How to Build (Linux/WSL2)
+
+1. Install avr-gcc and add the path to the commands to your `PATH`.
+2. Move to the directory corresponding to your desired MCU and run `make`.
+
+A HEX file will be generated under `build/`.

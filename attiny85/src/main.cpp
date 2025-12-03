@@ -40,11 +40,11 @@ int main() {
   set_int0_mode(true);
   GIMSK |= (1 << INT0);
 
-  sei();
-
+  // Initialize state machine
   bs2rst::init();
 
-  // Sleep
+  sei();
+
   while (true) {
     bs2rst::service();
   }

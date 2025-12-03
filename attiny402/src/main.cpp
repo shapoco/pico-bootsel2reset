@@ -28,18 +28,6 @@ static constexpr uint8_t PICO_BOOTSEL_PIN = 1;
 static constexpr uint8_t PICO_RUN_PIN = 2;
 static constexpr uint8_t TIMESEL_PIN = 3;
 
-static void set_int0_mode(bool edge) {
-  if (edge) {
-    // edge-sensitive
-    (&PORTA.PIN0CTRL)[PICO_BOOTSEL_PIN] &= ~PORT_ISC_gm;
-    (&PORTA.PIN0CTRL)[PICO_BOOTSEL_PIN] |= PORT_ISC_BOTHEDGES_gc;
-  } else {
-    // level-sensitive
-    (&PORTA.PIN0CTRL)[PICO_BOOTSEL_PIN] &= ~PORT_ISC_gm;
-    (&PORTA.PIN0CTRL)[PICO_BOOTSEL_PIN] |= PORT_ISC_LEVEL_gc;
-  }
-}
-
 int main() {
   // 20MHz / 16 = 1.25MHz
   _PROTECTED_WRITE(CLKCTRL.MCLKCTRLB, CLKCTRL_PEN_bm | CLKCTRL_PDIV_16X_gc);
@@ -51,14 +39,14 @@ int main() {
   (&PORTA.PIN0CTRL)[TIMESEL_PIN] |= PORT_PULLUPEN_bm;
 
   // Setup pin change interrupt for PICO_BOOTSEL_PIN
-  // set_int0_mode(true);
   (&PORTA.PIN0CTRL)[PICO_BOOTSEL_PIN] &= ~PORT_ISC_gm;
   (&PORTA.PIN0CTRL)[PICO_BOOTSEL_PIN] |= PORT_ISC_BOTHEDGES_gc;
-  sei();
 
+  // Initialize state machine
   bs2rst::init();
 
-  // Sleep
+  sei();
+
   while (true) {
     bs2rst::service();
   }
@@ -67,12 +55,12 @@ int main() {
 }
 
 ISR(PORTA_PORT_vect) {
-  PORTA.INTFLAGS = PORT_INT0_bm << PICO_BOOTSEL_PIN;  // Clear interrupt flag
+  PORTA.INTFLAGS = PORT_INT0_bm << PICO_BOOTSEL_PIN;
   bs2rst::bootsel_change();
 }
 
 ISR(TCA0_CMP0_vect) {
-  TCA0.SINGLE.INTFLAGS = TCA_SINGLE_CMP0_bm;  // Clear interrupt flag
+  TCA0.SINGLE.INTFLAGS = TCA_SINGLE_CMP0_bm;
   bs2rst::timer_tick();
 }
 
@@ -100,11 +88,8 @@ void bs2rst::reset_write(bool enable) {
 }
 
 void bs2rst::cpu_sleep(bool deep) {
-  // Recovery from power down state is only possible in level sensitivity
-  // set_int0_mode(!deep);
   set_sleep_mode(deep ? SLEEP_MODE_PWR_DOWN : SLEEP_MODE_IDLE);
   sleep_enable();
   sleep_cpu();
   sleep_disable();
-  // set_int0_mode(true);
 }
