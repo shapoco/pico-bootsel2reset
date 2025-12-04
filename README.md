@@ -21,10 +21,10 @@ https://github.com/user-attachments/assets/045de19f-95cd-49d6-bd9e-31ea8d296164
 |Connected to VCC or Open|4 sec|
 |Connected to GND|500 ms|
 
-|NOCLICK|Hold Time|
+|NOCLICK|Click|
 |:--|:--|
-|Connected to VCC or Open|Click Available|
-|Connected to GND|Click Disabled|
+|Connected to VCC or Open|Available|
+|Connected to GND|Disabled|
 
 ## For ATtiny10
 
