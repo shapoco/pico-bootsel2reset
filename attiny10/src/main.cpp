@@ -75,6 +75,8 @@ void bs2rst::timer_stop() {
 
 bool bs2rst::timesel_read() { return !(PINB & (1 << TIMESEL_PIN)); }
 
+bool bs2rst::noclick_read() { return false; }
+
 bool bs2rst::bootsel_read() { return !(PINB & (1 << PICO_BOOTSEL_PIN)); }
 
 void bs2rst::reset_write(bool enable) {

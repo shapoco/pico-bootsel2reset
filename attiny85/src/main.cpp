@@ -16,6 +16,7 @@
 static constexpr uint8_t PICO_BOOTSEL_PIN = PB2;
 static constexpr uint8_t PICO_RUN_PIN = PB3;
 static constexpr uint8_t TIMESEL_PIN = PB4;
+static constexpr uint8_t NOCLICK_PIN = PB0;
 
 static void set_int0_mode(bool edge) {
   if (edge) {
@@ -33,8 +34,11 @@ int main() {
   CLKPR = 3;              // Set clock prescaler to divide by 8 (1MHz)
 
   // Set pin directions
-  DDRB &= ~((1 << PICO_BOOTSEL_PIN) | (1 << PICO_RUN_PIN) | (1 << TIMESEL_PIN));
-  PORTB |= (1 << PICO_BOOTSEL_PIN) | (1 << TIMESEL_PIN);  // Enable pull-ups
+  DDRB &= ~((1 << PICO_BOOTSEL_PIN) | (1 << PICO_RUN_PIN) | (1 << TIMESEL_PIN) |
+            (1 << NOCLICK_PIN));
+
+  // Enable pull-ups
+  PORTB |= (1 << PICO_BOOTSEL_PIN) | (1 << TIMESEL_PIN) | (1 << NOCLICK_PIN);
 
   // Setup pin change interrupt for PICO_BOOTSEL_PIN
   set_int0_mode(true);
@@ -70,6 +74,8 @@ void bs2rst::timer_stop() {
 }
 
 bool bs2rst::timesel_read() { return !(PINB & (1 << TIMESEL_PIN)); }
+
+bool bs2rst::noclick_read() { return !(PINB & (1 << NOCLICK_PIN)); }
 
 bool bs2rst::bootsel_read() { return !(PINB & (1 << PICO_BOOTSEL_PIN)); }
 

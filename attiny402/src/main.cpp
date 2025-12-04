@@ -27,16 +27,20 @@
 static constexpr uint8_t PICO_BOOTSEL_PIN = 1;
 static constexpr uint8_t PICO_RUN_PIN = 2;
 static constexpr uint8_t TIMESEL_PIN = 3;
+static constexpr uint8_t NOCLICK_PIN = 6;
 
 int main() {
   // 20MHz / 16 = 1.25MHz
   _PROTECTED_WRITE(CLKCTRL.MCLKCTRLB, CLKCTRL_PEN_bm | CLKCTRL_PDIV_16X_gc);
 
   // Set pin directions
-  PORTA.DIRCLR =
-      (1 << PICO_BOOTSEL_PIN) | (1 << PICO_RUN_PIN) | (1 << TIMESEL_PIN);
+  PORTA.DIRCLR = (1 << PICO_BOOTSEL_PIN) | (1 << PICO_RUN_PIN) |
+                 (1 << TIMESEL_PIN) | (1 << NOCLICK_PIN);
+
+  // Enable pull-ups
   (&PORTA.PIN0CTRL)[PICO_BOOTSEL_PIN] |= PORT_PULLUPEN_bm;
   (&PORTA.PIN0CTRL)[TIMESEL_PIN] |= PORT_PULLUPEN_bm;
+  (&PORTA.PIN0CTRL)[NOCLICK_PIN] |= PORT_PULLUPEN_bm;
 
   // Setup pin change interrupt for PICO_BOOTSEL_PIN
   (&PORTA.PIN0CTRL)[PICO_BOOTSEL_PIN] &= ~PORT_ISC_gm;
@@ -75,6 +79,8 @@ void bs2rst::timer_start() {
 void bs2rst::timer_stop() { TCA0.SINGLE.CTRLA = 0; }
 
 bool bs2rst::timesel_read() { return !(PORTA.IN & (1 << TIMESEL_PIN)); }
+
+bool bs2rst::noclick_read() { return !(PORTA.IN & (1 << NOCLICK_PIN)); }
 
 bool bs2rst::bootsel_read() { return !(PORTA.IN & (1 << PICO_BOOTSEL_PIN)); }
 

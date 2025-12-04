@@ -8,6 +8,7 @@ static constexpr uint16_t STATE_STOP = 0xFFFF;
 static bool release_detected = false;
 static bool pressed = false;
 static bool use_long_hold_time = false;
+static bool no_click = false;
 static int8_t debounce_counter = 0;
 static uint16_t state_counter = STATE_STOP;
 static bool timer_running = false;
@@ -63,6 +64,7 @@ void timer_tick() {
   // read hold time selection
   if (pressed && !pressed_prev) {
     use_long_hold_time = timesel_read();
+    no_click = noclick_read();
   }
 
   // state machine
@@ -85,7 +87,11 @@ void timer_tick() {
         state_counter++;
       }
     } else {
-      state_counter = HOLD_TIME_LONG_MS;
+      if (no_click) {
+        deactivate();
+      } else {
+        state_counter = HOLD_TIME_LONG_MS;
+      }
     }
   } else if (state_counter < HOLD_TIME_LONG_MS + RESET_HOLD_TIME_MS) {
     reset_enable = true;

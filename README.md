@@ -14,14 +14,21 @@ https://github.com/user-attachments/assets/045de19f-95cd-49d6-bd9e-31ea8d296164
 
 ![](./img/connection.png)
 
-## Hold Time Selection
+## Configuration
 
 |TIMESEL|Hold Time|
 |:--|:--|
 |Connected to VCC or Open|4 sec|
 |Connected to GND|500 ms|
 
+|NOCLICK|Hold Time|
+|:--|:--|
+|Connected to VCC or Open|Click Available|
+|Connected to GND|Click Disabled|
+
 ## For ATtiny10
+
+Click is always available for ATtiny10.
 
 ### Pin Assign
 
@@ -52,7 +59,7 @@ Use the default value ​​for the fuse byte.
 |2|PB3|RUN|
 |3|PB4|TIMESEL|
 |4|GND|GND|
-|5|PB0 (MOSI)||
+|5|PB0 (MOSI)|NOCLICK|
 |6|PB1 (MISO)||
 |7|PB2 (SCK)|BOOTSEL|
 |8|VCC|3V3|
@@ -73,7 +80,7 @@ Use the default values ​​for the fuse bytes.
 |Pin|ATtiny402|Signal|
 |:--:|:--|:--|
 |1|VDD|3V3|
-|2|PA6||
+|2|PA6|NOCLICK|
 |3|PA7||
 |4|PA1|BOOTSEL|
 |5|PA2|RUN|
