@@ -18,8 +18,29 @@ https://github.com/user-attachments/assets/045de19f-95cd-49d6-bd9e-31ea8d296164
 
 |TIMESEL|Hold Time|
 |:--|:--|
-|Open|4 sec|
-|Connect to GND|500 ms|
+|Connected to VCC or Open|4 sec|
+|Connected to GND|500 ms|
+
+## For ATtiny10
+
+### Pin Assign
+
+|Pin|ATtiny402|Signal|
+|:--:|:--|:--|
+|1|PB0 (TPIDATA)|TIMESEL|
+|2|GND|GND|
+|3|PB1 (TPICLK)|RUN|
+|4|PA2|BOOTSEL|
+|5|VCC|3V3|
+|6|PB3 (RESET)||
+
+### Fuse
+
+Use the default value ​​for the fuse byte.
+
+|Byte|Value|
+|:--|:--|
+|Fuse|0xFF|
 
 ## For ATtiny85
 
