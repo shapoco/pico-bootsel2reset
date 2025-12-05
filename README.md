@@ -4,7 +4,7 @@ A mod chip that adds a reset function to the Raspberry Pi Pico's BOOTSEL switch.
 
 - Click BOOTSEL to reset the Pico
 - Hold BOOTSEL to enter mass storage mode
-- Selectable hold time: 500ms or 4sec
+- Selectable hold time: 500ms or 5sec
 
 ## Video
 
@@ -14,12 +14,16 @@ https://github.com/user-attachments/assets/045de19f-95cd-49d6-bd9e-31ea8d296164
 
 ![](./img/connection.png)
 
+## Waveform
+
+![](./img/waveform.png)
+
 ## Configuration
 
-|TIMESEL|Click Time|Hold Time|
+|TIMESEL|Click Time|Hold Time (t<sub>Hold</sub>)|
 |:--|:--|:--|
-|Tied to VCC or Open|1 sec|5 sec|
-|Tied to GND|100 ms|500 ms|
+|Tied to VCC or Open|1000 ms|5000 ms (4900ms)|
+|Tied to GND|100 ms|500 ms (400ms)|
 
 |NOCLICK|Click|
 |:--|:--|
