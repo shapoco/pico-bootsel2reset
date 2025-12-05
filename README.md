@@ -26,6 +26,9 @@ https://github.com/user-attachments/assets/045de19f-95cd-49d6-bd9e-31ea8d296164
 |Connected to VCC or Open|Available|
 |Connected to GND|Disabled|
 
+> [!NOTE]
+> In some applications, the RP2040/RP2350 itself may output a low-level pulse to BOOTSEL, causing a reset. In this case, disable the click function.
+
 ## For ATtiny10
 
 Click is always available for ATtiny10.
