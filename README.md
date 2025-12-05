@@ -16,15 +16,15 @@ https://github.com/user-attachments/assets/045de19f-95cd-49d6-bd9e-31ea8d296164
 
 ## Configuration
 
-|TIMESEL|Hold Time|
-|:--|:--|
-|Connected to VCC or Open|4 sec|
-|Connected to GND|500 ms|
+|TIMESEL|Click Time|Hold Time|
+|:--|:--|:--|
+|Tied to VCC or Open|1 sec|5 sec|
+|Tied to GND|100 ms|500 ms|
 
 |NOCLICK|Click|
 |:--|:--|
-|Connected to VCC or Open|Available|
-|Connected to GND|Disabled|
+|Tied to VCC or Open|Available|
+|Tied to GND|Disabled|
 
 > [!NOTE]
 > In some applications, the RP2040/RP2350 itself may output a low-level pulse to BOOTSEL, causing a reset. In this case, disable the click function.

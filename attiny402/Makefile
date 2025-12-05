@@ -39,6 +39,7 @@ CXXFLAGS := \
 LDFLAGS := \
 	-Wl,--gc-sections \
 	-mmcu=$(MCU) \
+	-flto
 
 EXTRA_DEPENDENCIES := \
 	Makefile
@@ -53,7 +54,7 @@ $(HEX): $(ELF) $(EXTRA_DEPENDENCIES)
 
 $(ELF): $(APP_OBJ_LIST) $(BS2RST_OBJ_LIST) $(EXTRA_DEPENDENCIES)
 	@mkdir -p $(BUILD_DIR)
-	$(CXX) $(CXXFLAGS) -o $@ $(APP_OBJ_LIST) $(BS2RST_OBJ_LIST) $(LDFLAGS)
+	$(CXX) $(LDFLAGS) -o $@ $(APP_OBJ_LIST) $(BS2RST_OBJ_LIST)
 	$(AVR_SIZE) $@
 
 $(BUILD_DIR)/%.o: $(APP_SRC_DIR)/%.cpp $(EXTRA_DEPENDENCIES)

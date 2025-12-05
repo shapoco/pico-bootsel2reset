@@ -2,11 +2,6 @@
 
 namespace bs2rst {
 
-static constexpr uint16_t CLICK_TIME_MS = 100;
-static constexpr uint16_t HOLD_TIME_SHORT_MS = 500;
-static constexpr uint16_t HOLD_TIME_LONG_MS = 4000;
-static constexpr uint16_t RESET_HOLD_TIME_MS = 100;
-
 void init();
 void service();
 void bootsel_change();
